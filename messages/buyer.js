@@ -1,5 +1,11 @@
-const getMessage = () => {
+const getSendReportMsg = () => {
     return `Сформируй свой отчёт одним текстовым сообщением и отправь его мне.`
 }
 
-module.exports = { getMessage };
+const getReportMsg = (report) => {
+    return `Твой отчёт:
+
+${report}`
+}
+
+module.exports = { getSendReportMsg, getReportMsg };
