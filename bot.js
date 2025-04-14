@@ -1,16 +1,26 @@
-const TelegramBot = require('node-telegram-bot-api');
-require("dotenv").config();
+module.exports = (bot) => {
+    // service functions
+    const { getUserRole } = require("./services/getUserRole");
 
-// replace the value below with the Telegram token you receive from @BotFather
-const token = process.env.BOT_TOKEN;
+    // Кнопки
+    const createButtons = require("./buttons/buyerButtons");
+    let { startBtn } = createButtons();
 
-// Create a bot that uses 'polling' to fetch new updates
-const bot = new TelegramBot(token, { polling: true });
+    // Listen for any kind of message. There are different kinds of messages
 
-// Listen for any kind of message. There are different kinds of messages
-bot.on('message', (msg, match) => {
-    // Starting message
-    if (msg.text === "/start") {
-        bot.sendMessage(msg.chat.id, 'Received your message');
-    }
-});
+    bot.on("message", async (msg) => {
+        if (msg.text === "/start") {
+            const res = await getUserRole(msg.from.id);
+
+            if (res.message.includes("admin")) {
+                bot.sendMessage(msg.from.id, `Доступ есть! Твоя роль - ${res.message.join(", ")}`)
+            }
+
+            if (res.message.includes("buyer")) {
+                bot.sendMessage(msg.from.id, `Доступ есть! Твоя роль - ${res.message.join(", ")}`, {
+                    reply_markup: startBtn
+                })
+            }
+        }
+    })
+}
