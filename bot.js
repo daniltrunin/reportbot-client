@@ -12,7 +12,9 @@ module.exports = (bot) => {
         if (msg.text === "/start") {
             const res = await getUserRole(msg.from.id);
 
-            if (!res.message.includes("admin") || !res.message.includes("manager") || !res.message.includes("buyer")) {
+            if (!res.message.includes("admin") &&
+                !res.message.includes("manager") &&
+                !res.message.includes("buyer")) {
                 bot.sendMessage(msg.from.id, `Нет доступа`)
             }
 

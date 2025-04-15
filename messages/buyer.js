@@ -5,7 +5,13 @@ const getSendReportMsg = () => {
 const getReportMsg = (report) => {
     return `Твой отчёт:
 
-${report}`
+${report}
+
+Сохранить?`
 }
 
-module.exports = { getSendReportMsg, getReportMsg };
+const getAcceptSendReportToServerMsg = () => {
+    return `Отчёт успешно отправлен!`
+}
+
+module.exports = { getSendReportMsg, getReportMsg, getAcceptSendReportToServerMsg };
