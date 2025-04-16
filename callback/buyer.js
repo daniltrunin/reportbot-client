@@ -4,7 +4,7 @@ module.exports = (bot) => {
 
     // Buttons
     const createButtons = require("../buttons/buyerButtons");
-    let { acceptReportText } = createButtons();
+    let { chooseTextForReport, chooseTextAndTagForReport } = createButtons();
 
     // states
     let userStates = {};
@@ -18,13 +18,17 @@ module.exports = (bot) => {
     const { getUserRole } = require("../services/getUserRole");
     const { getBuyerTeams } = require("../services/getBuyerTeams");
     const { getAllTags } = require("../services/getAllTags");
+    const { setReport } = require("../services/setReport");
 
     bot.on("message", async (msg) => {
         const res = await getUserRole(msg.from.id);
         if (!res.message.includes("buyer")) return;
 
         // нажал отправить отчёт
-        if (msg.text === "Отправить отчёт") {
+        if (msg.text === "Отправить отчёт" ||
+            msg.text === "отправить отчёт" ||
+            msg.text === "отправить отчет" ||
+            msg.text === "Отправить отчет") {
             userStates[msg.from.id] = "sending_text_to_report"
             const message = await getSendReportMsg();
             bot.sendMessage(msg.from.id, message)
@@ -36,7 +40,7 @@ module.exports = (bot) => {
             userReports[msg.from.id] = msg.text;
             const message = await getReportMsg(userReports[msg.from.id]);
             bot.sendMessage(msg.from.id, message, {
-                reply_markup: acceptReportText
+                reply_markup: chooseTextForReport
             })
             userStates[msg.from.id] = null;
         }
@@ -44,7 +48,7 @@ module.exports = (bot) => {
 
     bot.on("callback_query", async (query) => {
         // подтвердил отправленный текст и получил выбор тегов
-        if (query.data === "accept_send_report_to_server") {
+        if (query.data === "accept_text_of_report") {
             userStates[query.from.id] = "choosing_tags"
             const res = await getAllTags();
             const tags = res.message.map((e) => e);
@@ -86,28 +90,30 @@ module.exports = (bot) => {
             });
         }
 
-        if (query.data === "acceptChosenTags") {
+        if (query.data === "accept_chosen_tags") {
             bot.sendMessage(query.from.id, `Выбранные теги: ${userChosenTags[query.from.id]}
                 
-Текст отчёта: ${userReports[query.from.id]}`)
+Текст отчёта: ${userReports[query.from.id]}`, {
+                reply_markup: chooseTextAndTagForReport
+            })
         }
 
-        // if (query.data === "accept_send_report_to_server") {
-        //     const message = await getAcceptSendReportToServerMsg();
-        //     const teams = await getBuyerTeams(query.from.id);
-        //     if (!userReports[query.from.id]) {
-        //         return bot.sendMessage(query.from.id, "Ошибка. Не найден отчёт для отправки.");
-        //     }
-        //     const report = {
-        //         "user_id": query.from.id,
-        //         "message": userReports[query.from.id],
-        //         "tags": userChosenTags[query.from.id],
-        //         "teams": teams.message,
-        //         "media": []
-        //     }
-        //     console.log(report);
-        //     bot.sendMessage(query.from.id, message)
-        //     delete userReports[query.from.id];
-        // }
+        if (query.data === "accept_send_report_to_server") {
+            const message = await getAcceptSendReportToServerMsg();
+            const teams = await getBuyerTeams(query.from.id);
+            if (!userReports[query.from.id]) {
+                return bot.sendMessage(query.from.id, "Ошибка. Не найден отчёт для отправки.");
+            }
+            const report = {
+                "user_id": query.from.id,
+                "message": userReports[query.from.id],
+                "tags": userChosenTags[query.from.id],
+                "teams": teams.message,
+                "media": []
+            }
+            await setReport(report);
+            bot.sendMessage(query.from.id, message)
+            delete userReports[query.from.id];
+        }
     })
 }
