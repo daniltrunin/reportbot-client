@@ -1,6 +1,10 @@
 module.exports = (bot) => {
     // Messages
-    const { getSendReportMsg, getReportMsg, getAcceptSendReportToServerMsg } = require("../messages/buyer");
+    const { getSendReportMsg,
+        getReportMsg,
+        getAcceptSendReportToServerMsg,
+        getSavedYourTextNowChooseTagsMsg,
+        getShowYourChosenTagsAndChosenTextMsg } = require("../messages/buyer");
 
     // Buttons
     const createButtons = require("../buttons/buyerButtons");
@@ -56,44 +60,50 @@ module.exports = (bot) => {
             const createButtonsForTags = require("../buttons/buyerButtons");
             const { chooseTagForReport } = createButtonsForTags(tags);
 
-            bot.sendMessage(query.from.id, "Отлично, я сохранил твой текст. Теперь выберите один или несколько тегов", {
+            const message = getSavedYourTextNowChooseTagsMsg();
+            bot.sendMessage(query.from.id, message, {
                 reply_markup: chooseTagForReport
             })
         }
 
         if (query.data.startsWith("tag_to_send_")) {
-            // Получаем имя тега
             const tagName = query.data.slice("tag_to_send_".length);
-            // Создаём массив выбранных тегов, если его ещё нет
+
             if (!userChosenTags[query.from.id]) userChosenTags[query.from.id] = [];
-            // Проверяем, выбран ли этот тег уже
+
             const index = userChosenTags[query.from.id].indexOf(tagName);
-            // Если тег ещё не выбран — добавляем
+
             if (index === -1) {
                 userChosenTags[query.from.id].push(tagName);
-                // Если тег уже выбран — убираем из массива
             } else {
-                userChosenTags[query.from.id].splice(index, 1); // remove tag
+                userChosenTags[query.from.id].splice(index, 1);
             }
-            // Получаем все доступные теги
+
+            const currentTags = userChosenTags[query.from.id];
+
             const res = await getAllTags();
             const allTags = res.message;
-            // Формируем кнопки с учётом выбранных тегов
-            const { chooseTagForReport } = createButtons(allTags.map(tag => ({
+
+            const newButtons = createButtons(allTags.map(tag => ({
                 ...tag,
-                selected: userChosenTags[query.from.id].includes(tag.tag_name)
-            })));
-            // Обновляем клавиатуру в текущем сообщении
-            await bot.editMessageReplyMarkup(chooseTagForReport, {
-                chat_id: query.from.id,
-                message_id: query.message.message_id
-            });
+                selected: currentTags.includes(tag.tag_name)
+            }))).chooseTagForReport;
+
+            // Сравниваем с текущей клавиатурой, если она есть
+            const currentMarkup = query.message.reply_markup;
+
+            const stringify = obj => JSON.stringify(obj);
+            if (!currentMarkup || stringify(newButtons) !== stringify(currentMarkup)) {
+                await bot.editMessageReplyMarkup(newButtons, {
+                    chat_id: query.from.id,
+                    message_id: query.message.message_id
+                });
+            }
         }
 
         if (query.data === "accept_chosen_tags") {
-            bot.sendMessage(query.from.id, `Выбранные теги: ${userChosenTags[query.from.id]}
-                
-Текст отчёта: ${userReports[query.from.id]}`, {
+            const message = getShowYourChosenTagsAndChosenTextMsg(userChosenTags[query.from.id], userReports[query.from.id])
+            bot.sendMessage(query.from.id, message, {
                 reply_markup: chooseTextAndTagForReport
             })
         }

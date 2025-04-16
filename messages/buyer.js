@@ -14,4 +14,23 @@ const getAcceptSendReportToServerMsg = () => {
     return `Отчёт успешно отправлен!`
 }
 
-module.exports = { getSendReportMsg, getReportMsg, getAcceptSendReportToServerMsg };
+const getSavedYourTextNowChooseTagsMsg = () => {
+    return `Отлично, я сохранил твой текст. Теперь выбери один или несколько тегов`
+}
+
+const getShowYourChosenTagsAndChosenTextMsg = (tags, message) => {
+    return `Выбранные теги: ${tags}
+    
+Сохранённый текст:
+${message}
+
+Отправляем?`
+}
+
+module.exports = {
+    getSendReportMsg,
+    getReportMsg,
+    getAcceptSendReportToServerMsg,
+    getSavedYourTextNowChooseTagsMsg,
+    getShowYourChosenTagsAndChosenTextMsg
+};
