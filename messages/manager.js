@@ -8,7 +8,7 @@ const getStartManagerMsg = (res) => {
 
 const getReceiveSingleReportMsg = (report) => {
     return `
-<b>${report.dateRU}</b> @${report.user_id.username || "Неизвестно"}
+<b>${report.dateString}</b> @${report.user_id.username || "Неизвестно"}
 Команда - ${report.teams?.join(", ") || "—"}, теги - ${report.tags?.join(", ") || "—"}
 
 <b>Отчёт:</b>

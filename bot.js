@@ -19,18 +19,8 @@ module.exports = (bot) => {
             }
 
             if (res.message.includes("admin")) {
-                bot.sendMessage(msg.from.id, `Доступ есть! Твоя роль - ${res.message.join(", ")}`)
+                bot.sendMessage(msg.from.id, `Твоя роль - ${res.message.join(", ")}`)
             }
-
-            // if (res.message.includes("manager")) {
-            //     bot.sendMessage(msg.from.id, `Доступ есть! Твоя роль - ${res.message.join(", ")}`)
-            // }
-
-            // if (res.message.includes("buyer")) {
-            //     bot.sendMessage(msg.from.id, `Доступ есть! Твоя роль - ${res.message.join(", ")}`, {
-            //         reply_markup: startBtn
-            //     })
-            // }
         }
     })
 }

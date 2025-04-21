@@ -4,7 +4,7 @@ const createButtons = (managers = []) => {
             inline_keyboard: [
                 [{ text: "Весь отчёт", callback_data: "get_full_report" }],
                 ...managers.map(manager => [
-                    { text: `${manager.name}`, callback_data: `get_${manager}` }
+                    { text: `${manager.username}`, callback_data: `get_data_of_manager_${manager.username}` }
                 ])
             ],
         },

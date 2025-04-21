@@ -7,6 +7,7 @@ module.exports = (bot) => {
     // service functions
     const { getUserRole } = require("../services/getUserRole");
     const { receiveAllReportsByCurrentday } = require("../services/receiveAllReportsByCurrentday")
+    const { getAllManagers } = require("../services/getAllManagers")
 
     // Кнопки
     const createButtons = require("../buttons/managerButtons");
@@ -17,6 +18,11 @@ module.exports = (bot) => {
         if (msg.text === "/start") {
             const res = await getUserRole(msg.from.id);
             const startMsg = getStartManagerMsg(res)
+
+            const managers = await getAllManagers();
+            const managersArray = [managers.message]
+            const createButtonsForManagers = require("../buttons/managerButtons");
+            const { startBtn } = createButtonsForManagers(managersArray);
 
             if (res.message.includes("manager")) {
                 bot.sendMessage(msg.from.id, startMsg, {
