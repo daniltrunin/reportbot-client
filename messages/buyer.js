@@ -1,5 +1,11 @@
+const getStartBuyerMsg = (res) => {
+    return `<b>Бот для отчётности — Баинг Отдел</b>
+
+Твоя роль - <b>${res.message.join(", ")}</b>`
+}
+
 const getSendReportMsg = () => {
-    return `Сформируй свой отчёт одним текстовым сообщением и отправь его мне.`
+    return `Сформируй свой отчёт одним текстовым сообщением и отправь его мне`
 }
 
 const getReportMsg = (report) => {
@@ -28,6 +34,7 @@ ${message}
 }
 
 module.exports = {
+    getStartBuyerMsg,
     getSendReportMsg,
     getReportMsg,
     getAcceptSendReportToServerMsg,

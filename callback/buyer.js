@@ -1,6 +1,8 @@
 module.exports = (bot) => {
     // Messages
-    const { getSendReportMsg,
+    const {
+        getStartBuyerMsg,
+        getSendReportMsg,
         getReportMsg,
         getAcceptSendReportToServerMsg,
         getSavedYourTextNowChooseTagsMsg,
@@ -8,7 +10,7 @@ module.exports = (bot) => {
 
     // Buttons
     const createButtons = require("../buttons/buyerButtons");
-    let { chooseTextForReport, chooseTextAndTagForReport } = createButtons();
+    let { startBtn, chooseTextForReport, chooseTextAndTagForReport } = createButtons();
 
     // states
     let userStates = {};
@@ -25,8 +27,18 @@ module.exports = (bot) => {
     const { setReport } = require("../services/setReport");
 
     bot.on("message", async (msg) => {
-        const res = await getUserRole(msg.from.id);
-        if (!res.message.includes("buyer")) return;
+        if (msg.text === "/start") {
+            const res = await getUserRole(msg.from.id);
+            if (!res.message.includes("buyer")) return;
+
+            if (res.message.includes("buyer")) {
+                const message = getStartBuyerMsg(res);
+                bot.sendMessage(msg.from.id, message, {
+                    parse_mode: "HTML",
+                    reply_markup: startBtn
+                })
+            }
+        }
 
         // нажал отправить отчёт
         if (msg.text === "Отправить отчёт" ||

@@ -5,3 +5,4 @@ const bot = new TelegramBot(token, { polling: true });
 
 require("./bot")(bot);    // Подключает админ-логику
 require("./callback/buyer")(bot);  // Подключает buyer-логику
+require("./callback/manager")(bot);  // Подключает manager-логику

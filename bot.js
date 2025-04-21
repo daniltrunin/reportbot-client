@@ -22,15 +22,15 @@ module.exports = (bot) => {
                 bot.sendMessage(msg.from.id, `Доступ есть! Твоя роль - ${res.message.join(", ")}`)
             }
 
-            if (res.message.includes("manager")) {
-                bot.sendMessage(msg.from.id, `Доступ есть! Твоя роль - ${res.message.join(", ")}`)
-            }
+            // if (res.message.includes("manager")) {
+            //     bot.sendMessage(msg.from.id, `Доступ есть! Твоя роль - ${res.message.join(", ")}`)
+            // }
 
-            if (res.message.includes("buyer")) {
-                bot.sendMessage(msg.from.id, `Доступ есть! Твоя роль - ${res.message.join(", ")}`, {
-                    reply_markup: startBtn
-                })
-            }
+            // if (res.message.includes("buyer")) {
+            //     bot.sendMessage(msg.from.id, `Доступ есть! Твоя роль - ${res.message.join(", ")}`, {
+            //         reply_markup: startBtn
+            //     })
+            // }
         }
     })
 }
