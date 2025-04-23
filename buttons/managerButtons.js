@@ -24,4 +24,28 @@ const createButtonsForTags = (tags = [], teamName) => {
     }
 }
 
-module.exports = { createButtonsForManagers, createButtonsForTags };
+const createButtonsOfBuyersList = (buyers = []) => {
+    return {
+        buyersListByTeamAndName: {
+            inline_keyboard: [
+                ...buyers.map((b) => [
+                    { text: `${b}`, callback_data: `get_buyer_list_reports_by_team_and_tag_by_${b}` }
+                ])
+            ]
+        }
+    }
+}
+
+const createButtonsOfBuyerDates = (reports = [], buyer) => {
+    return {
+        buyerDatesOfReports: {
+            inline_keyboard: [
+                ...reports.map((r) => [
+                    { text: `${r}`, callback_data: `get_report_from_buyer_on_day_${r}_${buyer}` }
+                ])
+            ]
+        }
+    }
+}
+
+module.exports = { createButtonsForManagers, createButtonsForTags, createButtonsOfBuyersList, createButtonsOfBuyerDates };

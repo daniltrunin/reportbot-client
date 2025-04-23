@@ -21,11 +21,11 @@ const getAcceptSendReportToServerMsg = () => {
 }
 
 const getSavedYourTextNowChooseTagsMsg = () => {
-    return `Отлично, я сохранил твой текст. Теперь выбери один или несколько тегов`
+    return `Отлично, я сохранил твой текст. Теперь выбери тег`
 }
 
 const getShowYourChosenTagsAndChosenTextMsg = (tags, message) => {
-    return `Выбранные теги: ${tags}
+    return `Выбранный тег: ${tags}
     
 Сохранённый текст:
 ${message}

@@ -17,7 +17,7 @@ const createButtons = (tags = []) => {
                 ...tags.map(tag => [
                     { text: tag.selected ? `✅ ${tag.tag_name}` : tag.tag_name, callback_data: `tag_to_send_${tag.tag_name}` }
                 ]),
-                [{ text: "Подтвердить выбранные теги", callback_data: "accept_chosen_tags" }]]
+                [{ text: "Подтвердить выбор", callback_data: "accept_chosen_tags" }]]
         },
         chooseTextAndTagForReport: {
             inline_keyboard: [

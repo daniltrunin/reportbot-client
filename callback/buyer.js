@@ -14,7 +14,6 @@ module.exports = (bot) => {
 
     // states
     let userStates = {};
-
     // Сообщение отчёта которое пользователь написал в процессе создания отчёта
     let userReports = {};
     // Теги которые пользователь выбрал в процессе создания отчёта
@@ -80,28 +79,25 @@ module.exports = (bot) => {
 
         if (query.data.startsWith("tag_to_send_")) {
             const tagName = query.data.slice("tag_to_send_".length);
+            const userId = query.from.id;
 
-            if (!userChosenTags[query.from.id]) userChosenTags[query.from.id] = [];
-
-            const index = userChosenTags[query.from.id].indexOf(tagName);
-
-            if (index === -1) {
-                userChosenTags[query.from.id].push(tagName);
+            // Если пользователь нажал на уже выбранный тег — снимаем выбор
+            if (userChosenTags[userId] === tagName) {
+                userChosenTags[userId] = null;
             } else {
-                userChosenTags[query.from.id].splice(index, 1);
+                userChosenTags[userId] = tagName;
             }
 
-            const currentTags = userChosenTags[query.from.id];
+            const selectedTag = userChosenTags[userId];
 
             const res = await getAllTags();
             const allTags = res.message;
 
             const newButtons = createButtons(allTags.map(tag => ({
                 ...tag,
-                selected: currentTags.includes(tag.tag_name)
+                selected: selectedTag === tag.tag_name
             }))).chooseTagForReport;
 
-            // Сравниваем с текущей клавиатурой, если она есть
             const currentMarkup = query.message.reply_markup;
 
             const stringify = obj => JSON.stringify(obj);
