@@ -9,11 +9,9 @@ const getSendReportMsg = () => {
 }
 
 const getReportMsg = (report) => {
-    return `Твой отчёт:
+    return `<b>Твой отчёт</b>
 
-${report}
-
-Сохранить?`
+<i>${report}</i>`
 }
 
 const getAcceptSendReportToServerMsg = () => {
@@ -21,16 +19,15 @@ const getAcceptSendReportToServerMsg = () => {
 }
 
 const getSavedYourTextNowChooseTagsMsg = () => {
-    return `Отлично, я сохранил твой текст. Теперь выбери тег`
+    return `<b>Теперь выбери тег</b>
+Твой отчёт закрепится с этим тегом`
 }
 
 const getShowYourChosenTagsAndChosenTextMsg = (tags, message) => {
-    return `Выбранный тег: ${tags}
+    return `<b>Выбранный тег</b> <i>${tags}</i>
     
-Сохранённый текст:
-${message}
-
-Отправляем?`
+<b>Текст отчёта</b>
+<i>${message}</i>`
 }
 
 module.exports = {

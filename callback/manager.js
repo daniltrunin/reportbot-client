@@ -2,7 +2,7 @@ const { parse } = require("dotenv");
 
 module.exports = (bot) => {
     // Messages
-    const { getStartManagerMsg, getReceiveSingleReportMsg } = require("../messages/manager");
+    const { getStartManagerMsg, getReceiveSingleReportMsg, getDataOfManagerMsg, getBuyersListByTeamAndNameMsg } = require("../messages/manager");
 
     // states
     let userChosenTeamForFindingReports = {};
@@ -22,6 +22,29 @@ module.exports = (bot) => {
     bot.on("message", async (msg) => {
         if (msg.text === "/start") {
             const res = await getUserRole(msg.from.id);
+            if (!res || !res.message || !Array.isArray(res.message) || !res.message.includes("manager")) {
+                return
+            }
+
+            if (res.message.includes("manager")) {
+                const startMsg = getStartManagerMsg(res)
+                const managers = await getAllManagers();
+                const { createButtonsForManagers } = require("../buttons/managerButtons");
+                const { startBtn } = createButtonsForManagers(managers.message);
+                bot.sendMessage(msg.from.id, startMsg, {
+                    parse_mode: "HTML",
+                    reply_markup: startBtn
+                })
+            }
+
+            delete userChosenTeamForFindingReports[msg.from.id];
+            delete userChosenTagForFindingReports[msg.from.id];
+        }
+    })
+
+    bot.on("callback_query", async (query) => {
+        if (query.data === "on_start") {
+            const res = await getUserRole(query.from.id);
             const startMsg = getStartManagerMsg(res)
 
             const managers = await getAllManagers();
@@ -29,15 +52,16 @@ module.exports = (bot) => {
             const { startBtn } = createButtonsForManagers(managers.message);
 
             if (res.message.includes("manager")) {
-                bot.sendMessage(msg.from.id, startMsg, {
+                bot.sendMessage(query.from.id, startMsg, {
                     parse_mode: "HTML",
                     reply_markup: startBtn
                 })
             }
-        }
-    })
 
-    bot.on("callback_query", async (query) => {
+            delete userChosenTeamForFindingReports[query.from.id];
+            delete userChosenTagForFindingReports[query.from.id];
+        }
+
         // полный отчёт о всех баерах всех команд
         if (query.data === "get_full_report") {
             const res = await receiveAllReportsByCurrentday();
@@ -48,9 +72,12 @@ module.exports = (bot) => {
                 });
             };
             for (const report of reports) {
+                const { createButtonOfBuyerDm } = require("../buttons/managerButtons");
+                const { buyerDm } = createButtonOfBuyerDm(report);
                 const message = getReceiveSingleReportMsg(report);
                 await bot.sendMessage(query.from.id, message, {
-                    parse_mode: "HTML"
+                    parse_mode: "HTML",
+                    reply_markup: buyerDm
                 });
                 await new Promise(resolve => setTimeout(resolve, 500));
             }
@@ -65,7 +92,9 @@ module.exports = (bot) => {
 
             userChosenTeamForFindingReports[query.from.id] = teamName
 
-            bot.sendMessage(query.from.id, `Команда <b>${teamName}</b>\n\nПолучить список байеров по тегам\n\nПолучить полный отчёт команды за день`, {
+            const message = getDataOfManagerMsg(teamName)
+
+            bot.sendMessage(query.from.id, message, {
                 parse_mode: "HTML",
                 reply_markup: teamLeadBtn
             })
@@ -81,9 +110,12 @@ module.exports = (bot) => {
                 });
             };
             for (const report of reports.reports) {
+                const { createButtonOfBuyerDm } = require("../buttons/managerButtons");
+                const { buyerDm } = createButtonOfBuyerDm(report);
                 const message = getReceiveSingleReportMsg(report);
                 await bot.sendMessage(query.from.id, message, {
-                    parse_mode: "HTML"
+                    parse_mode: "HTML",
+                    reply_markup: buyerDm
                 });
                 await new Promise(resolve => setTimeout(resolve, 500));
             }
@@ -99,11 +131,14 @@ module.exports = (bot) => {
             resMessage.map((obj) => allBuyers.push(obj.user_id.username))
             let uniqueBuyers = new Set(allBuyers);
             let uniqueBuyersArray = [...uniqueBuyers]
+            console.log(`Список байеров ${resMessage}`)
 
             const { createButtonsOfBuyersList } = require("../buttons/managerButtons");
             const { buyersListByTeamAndName } = createButtonsOfBuyersList(uniqueBuyersArray)
 
-            await bot.sendMessage(query.from.id, `Список байеров команды ${userChosenTeamForFindingReports[query.from.id]} по тегу ${tagName}`, {
+            const message = getBuyersListByTeamAndNameMsg(resMessage, userChosenTeamForFindingReports[query.from.id], tagName)
+
+            await bot.sendMessage(query.from.id, message, {
                 parse_mode: "HTML",
                 reply_markup: buyersListByTeamAndName
             });
@@ -124,7 +159,7 @@ module.exports = (bot) => {
             const { createButtonsOfBuyerDates } = require("../buttons/managerButtons");
             const { buyerDatesOfReports } = createButtonsOfBuyerDates(reportsArray, buyerName);
 
-            bot.sendMessage(query.from.id, `Отчёты байера ${buyerName} по тегу ${tagName}`, {
+            bot.sendMessage(query.from.id, `Отчёты байера <i>${buyerName}</i> по тегу <i>${tagName}</i>`, {
                 parse_mode: "HTML",
                 reply_markup: buyerDatesOfReports
             });
@@ -150,9 +185,12 @@ module.exports = (bot) => {
                 });
             };
             for (const report of reports) {
+                const { createButtonOfBuyerDm } = require("../buttons/managerButtons");
+                const { buyerDm } = createButtonOfBuyerDm(report);
                 const message = getReceiveSingleReportMsg(report);
                 await bot.sendMessage(query.from.id, message, {
-                    parse_mode: "HTML"
+                    parse_mode: "HTML",
+                    reply_markup: buyerDm
                 });
                 await new Promise(resolve => setTimeout(resolve, 500));
             }

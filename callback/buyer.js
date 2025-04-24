@@ -28,7 +28,9 @@ module.exports = (bot) => {
     bot.on("message", async (msg) => {
         if (msg.text === "/start") {
             const res = await getUserRole(msg.from.id);
-            if (!res.message.includes("buyer")) return;
+            if (!res || !res.message || !Array.isArray(res.message) || !res.message.includes("buyer")) {
+                return
+            }
 
             if (res.message.includes("buyer")) {
                 const message = getStartBuyerMsg(res);
@@ -46,7 +48,9 @@ module.exports = (bot) => {
             msg.text === "Отправить отчет") {
             userStates[msg.from.id] = "sending_text_to_report"
             const message = await getSendReportMsg();
-            bot.sendMessage(msg.from.id, message)
+            bot.sendMessage(msg.from.id, message, {
+                parse_mode: "HTML"
+            })
             return;
         }
 
@@ -55,6 +59,7 @@ module.exports = (bot) => {
             userReports[msg.from.id] = msg.text;
             const message = await getReportMsg(userReports[msg.from.id]);
             bot.sendMessage(msg.from.id, message, {
+                parse_mode: "HTML",
                 reply_markup: chooseTextForReport
             })
             userStates[msg.from.id] = null;
@@ -73,8 +78,26 @@ module.exports = (bot) => {
 
             const message = getSavedYourTextNowChooseTagsMsg();
             bot.sendMessage(query.from.id, message, {
+                parse_mode: "HTML",
                 reply_markup: chooseTagForReport
             })
+        }
+
+        if (query.data === "decline_sending_report") {
+            const res = await getUserRole(query.from.id);
+            if (!res.message.includes("buyer")) return;
+
+            if (res.message.includes("buyer")) {
+                const message = getStartBuyerMsg(res);
+                bot.sendMessage(query.from.id, message, {
+                    parse_mode: "HTML",
+                    reply_markup: startBtn
+                })
+            }
+
+            delete userStates[query.from.id];
+            delete userReports[query.from.id];
+            delete userChosenTags[query.from.id];
         }
 
         if (query.data.startsWith("tag_to_send_")) {
@@ -112,6 +135,7 @@ module.exports = (bot) => {
         if (query.data === "accept_chosen_tags") {
             const message = getShowYourChosenTagsAndChosenTextMsg(userChosenTags[query.from.id], userReports[query.from.id])
             bot.sendMessage(query.from.id, message, {
+                parse_mode: "HTML",
                 reply_markup: chooseTextAndTagForReport
             })
         }
@@ -120,7 +144,7 @@ module.exports = (bot) => {
             const message = await getAcceptSendReportToServerMsg();
             const teams = await getBuyerTeams(query.from.id);
             if (!userReports[query.from.id]) {
-                return bot.sendMessage(query.from.id, "Ошибка. Не найден отчёт для отправки.");
+                return bot.sendMessage(query.from.id, "Ошибка. Не найден отчёт для отправки");
             }
             const report = {
                 "user_id": query.from.id,
@@ -130,8 +154,12 @@ module.exports = (bot) => {
                 "media": []
             }
             await setReport(report);
-            bot.sendMessage(query.from.id, message)
+            bot.sendMessage(query.from.id, message, {
+                parse_mode: "HTML"
+            })
+            delete userStates[query.from.id];
             delete userReports[query.from.id];
+            delete userChosenTags[query.from.id];
         }
     })
 }
