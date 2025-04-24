@@ -171,10 +171,6 @@ module.exports = (bot) => {
             const tag = userChosenTagForFindingReports[query.from.id];
             const buyer = parts.slice(1).join("_");
             const team = userChosenTeamForFindingReports[query.from.id]
-            console.log(`Дата: ${date}`)
-            console.log(`Тег: ${tag}`)
-            console.log(`Байер: ${buyer}`)
-            console.log(`Команда: ${team}`)
 
             const res = await getReportsByDateTagsBuyerTeam(date, tag, buyer, team);
             const reports = res.message
