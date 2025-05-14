@@ -6,7 +6,7 @@
   <br>
 </h1>
 
-<h4 align="center">Application for accounting and reporting based on <a href="https://react.dev/" target="_blank">Node.js and Express.js</a></h4>
+<h4 align="center">Application for accounting and reporting based on Node.js and <a href="https://expressjs.com/" target="_blank">Express.js</a></h4>
 <h4 align="center">Created by frontend and bot developer from Orenburg, Russia — <a href="https://github.com/daniltrunin" target="_blank">Daniil</a></h4>
 
 <p align="center">
